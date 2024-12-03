@@ -15,12 +15,34 @@
             height: 500px;
             margin: auto;
         }
+        .parking-slots {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .parking-slot {
+            width: 100px;
+            height: 50px;
+            margin: 10px;
+            border: 2px solid #333;
+            text-align: center;
+            line-height: 50px;
+            font-weight: bold;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <h1>Real-Time Sensor Data Graph</h1>
     <div class="chart-container">
         <canvas id="sensorGraph"></canvas>
+    </div>
+
+    <div class="parking-slots">
+        <div id="slot1" class="parking-slot">Slot 1</div>
+        <div id="slot2" class="parking-slot">Slot 2</div>
+        <div id="slot3" class="parking-slot">Slot 3</div>
     </div>
 
     <script>
@@ -87,13 +109,18 @@
                 sensorGraph.data.datasets[1].data.push(data.sensor_2);
                 sensorGraph.data.datasets[2].data.push(data.sensor_3);
 
+                // Update parking slot colors based on distance
+                updateParkingSlotColor('slot1', data.sensor_1);
+                updateParkingSlotColor('slot2', data.sensor_2);
+                updateParkingSlotColor('slot3', data.sensor_3);
+
                 // Keep the graph within 20 points
-                /*if (sensorGraph.data.labels.length > 20) {
+                if (sensorGraph.data.labels.length > 20) {
                     sensorGraph.data.labels.shift();
                     sensorGraph.data.datasets[0].data.shift();
                     sensorGraph.data.datasets[1].data.shift();
                     sensorGraph.data.datasets[2].data.shift();
-                }*/
+                }
 
                 sensorGraph.update(); // Redraw the graph
                 time++;
@@ -102,8 +129,20 @@
             }
         }
 
+        // Function to update parking slot colors based on distance
+        function updateParkingSlotColor(slotId, distance) {
+            const slotElement = document.getElementById(slotId);
+
+            // Change color based on distance
+            if (distance > 100) {
+                slotElement.style.backgroundColor = 'green'; // Slot is available
+            } else {
+                slotElement.style.backgroundColor = 'red'; // Slot is occupied
+            }
+        }
+
         // Fetch and update the graph every second
-        setInterval(fetchSensorData, 100);
+        setInterval(fetchSensorData, 1000); // Fetch every second (1000 ms)
     </script>
 </body>
 </html>
