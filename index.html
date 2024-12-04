@@ -28,8 +28,9 @@
             text-align: center;
             line-height: 50px;
             font-weight: bold;
-            color: white;
+            color: rgb(175, 175, 175);
             transition: background-color 0.3s ease;
+            background-color: rgb(84, 84, 84);
         }
     </style>
 </head>
@@ -82,7 +83,7 @@
                 scales: {
                     x: {
                         title: {
-                            display: true,
+                            display: false,
                             text: 'Time (seconds)',
                         },
                     },
@@ -96,15 +97,20 @@
             },
         });
 
-        // Function to fetch sensor data and update the graph
-        let time = 0; // Keeps track of time in seconds
+  
+        let currentTime = 0; // Current time in milliseconds
+        let interval = 500; // Interval in milliseconds
+        const maxDataPoints = 10; // Maximum number of data points to keep
+
+    
         async function fetchSensorData() {
             try {
                 const response = await fetch("http://127.0.0.1:8000/sensors");
                 const data = await response.json();
 
                 // Update the graph
-                sensorGraph.data.labels.push(time);
+                currentTime += interval; // Increment time by interval
+                sensorGraph.data.labels.push('');
                 sensorGraph.data.datasets[0].data.push(data.sensor_1);
                 sensorGraph.data.datasets[1].data.push(data.sensor_2);
                 sensorGraph.data.datasets[2].data.push(data.sensor_3);
@@ -115,15 +121,13 @@
                 updateParkingSlotColor('slot3', data.sensor_3);
 
                 // Keep the graph within 20 points
-                if (sensorGraph.data.labels.length > 20) {
+                /*if (sensorGraph.data.labels.length > maxDataPoints) {
                     sensorGraph.data.labels.shift();
                     sensorGraph.data.datasets[0].data.shift();
                     sensorGraph.data.datasets[1].data.shift();
                     sensorGraph.data.datasets[2].data.shift();
-                }
-
+                }*/
                 sensorGraph.update(); // Redraw the graph
-                time++;
             } catch (error) {
                 console.error("Error fetching sensor data:", error);
             }
@@ -136,13 +140,15 @@
             // Change color based on distance
             if (distance > 100) {
                 slotElement.style.backgroundColor = 'green'; // Slot is available
+                slotElement.style.color = 'white';
             } else {
                 slotElement.style.backgroundColor = 'red'; // Slot is occupied
+                slotElement.style.color = 'white';
             }
         }
 
         // Fetch and update the graph every second
-        setInterval(fetchSensorData, 1000); // Fetch every second (1000 ms)
+        setInterval(fetchSensorData, interval);
     </script>
 </body>
 </html>
