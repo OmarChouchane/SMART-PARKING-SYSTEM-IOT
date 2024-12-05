@@ -15,9 +15,9 @@ app.add_middleware(
 
 # Dictionary to store the latest sensor data
 sensor_data: Dict[str, float] = {
-    "sensor_1": 0,
-    "sensor_2": 0,
-    "sensor_3": 0,
+    "sensor_1": -1,
+    "sensor_2": -1,
+    "sensor_3": -1,
 }
 
 # MQTT Callbacks
