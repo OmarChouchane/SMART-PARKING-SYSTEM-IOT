@@ -126,7 +126,7 @@
                 // Check if the data is valid (i.e., not all -1 values)
                 if (!data || (data.sensor_1 === -1 && data.sensor_2 === -1 && data.sensor_3 === -1)) {
                     console.error("No valid data received. Skipping update.");
-                    return; // If no valid data, return early without updating anything
+                   // If no valid data, return early without updating anything
                 }
 
                 // If new data is valid and has changed, update the graph
@@ -237,14 +237,24 @@ function updateParkingSlot(slotId, distance) {
             slotElement.style.color = 'white';
             slotElement.textContent = 'Available';
             slotStates[slotId] = 'free';  // Slot is free
-        } else {
+        } else if (distance <= 100 && distance > 0) {
             // Slot is occupied
             slotElement.style.backgroundColor = 'red';
             slotElement.style.color = 'white';
             slotElement.textContent = 'Occupied';
             slotStates[slotId] = 'occupied';  // Slot is occupied
         }
+        else {
+            // slot if not connected
+            slotElement.style.backgroundColor = 'gray';
+            slotElement.style.color = 'white';
+            slotElement.textContent = 'Not Connected';
+            slotStates[slotId] = 'not connected';  // Slot is not connected
+        }
     }
+
+    console.log("Slot ID:", slotId);
+    console.log("Slot Text:", slotElement.textContent);
 
     // Ensure button visibility based on the updated state
     const buttonElement = document.getElementById(`button${slotId.slice(-1)}`);
