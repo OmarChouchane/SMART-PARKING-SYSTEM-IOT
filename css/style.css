@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+.chart-container {
+    width: 80%;
+    height: 500px;
+    margin: auto;
+}
+
+.parking-slot {
+    
+    margin: 10px;
+    border: 2px solid #333;
+    text-align: center;
+    line-height: 50px;
+    font-weight: bold;
+    color: white;
+    transition: background-color 0.3s ease;
+    background-color: rgb(84, 84, 84);
+}
+.reserve-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+.reserve-button:hover {
+    background-color: #45a049;
+}
+#dismiss-button {
+    display: none;
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+#dismiss-button:hover {
+    background-color: #e53935;
+}
