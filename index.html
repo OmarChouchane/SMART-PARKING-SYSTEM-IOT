@@ -28,9 +28,33 @@
             text-align: center;
             line-height: 50px;
             font-weight: bold;
-            color: rgb(175, 175, 175);
+            color: white;
             transition: background-color 0.3s ease;
             background-color: rgb(84, 84, 84);
+        }
+        .reserve-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .reserve-button:hover {
+            background-color: #45a049;
+        }
+        #dismiss-button {
+            display: none;
+            padding: 5px 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #dismiss-button:hover {
+            background-color: #e53935;
         }
     </style>
 </head>
@@ -41,25 +65,89 @@
     </div>
 
     <div class="parking-slots">
-         <!-- Slot 1 -->
-         <div class="parking-slot-container">
+        <!-- Slot 1 -->
+        <div class="parking-slot-container">
             <div id="slot1" class="parking-slot">Slot 1</div>
-            <button id="button1" class="slot-button" onclick="toggleReservation('slot1', 'button1')">Reserve</button>
+            <button id="slot1-reserve" class="reserve-button" onclick="reserveSlot('slot1')">Reserve</button>
         </div>
         <!-- Slot 2 -->
         <div class="parking-slot-container">
             <div id="slot2" class="parking-slot">Slot 2</div>
-            <button id="button2" class="slot-button" onclick="toggleReservation('slot2', 'button2')">Reserve</button>
+            <button id="slot2-reserve" class="reserve-button" onclick="reserveSlot('slot2')">Reserve</button>
         </div>
         <!-- Slot 3 -->
         <div class="parking-slot-container">
             <div id="slot3" class="parking-slot">Slot 3</div>
-            <button id="button3" class="slot-button" onclick="toggleReservation('slot3', 'button3')">Reserve</button>
+            <button id="slot3-reserve" class="reserve-button" onclick="reserveSlot('slot3')">Reserve</button>
         </div>
     </div>
 
+    <button id="dismiss-button" onclick="dismissReservation()">Dismiss Reservation</button>
 
     <script>
+        // Track the reserved slot
+        let reservedSlot = null;
+
+        // Function to reserve a slot
+        function reserveSlot(slotId) {
+            if (reservedSlot) {
+
+                return;
+            }
+
+            reservedSlot = slotId; // Set the reserved slot
+
+            // Hide all other reservation buttons
+            document.querySelectorAll(".reserve-button").forEach(button => {
+                
+            button.style.display = "none"; // Hide buttons
+
+            });
+
+            // Change the color of the reserved slot
+            document.getElementById(slotId).style.backgroundColor = "orange"; // Orange for reserved
+
+            // Optionally disable the dismiss button if needed
+            document.getElementById("dismiss-button").style.display = "block";
+        }
+
+        // Function to dismiss the reservation
+        function dismissReservation() {
+            if (!reservedSlot) {
+                return;
+            }
+
+            reservedSlot = null; // Clear the reserved slot
+
+            // Show all reservation buttons
+            document.querySelectorAll(".reserve-button").forEach(button => {
+                button.style.display = "block"; // Show all buttons
+            });
+
+            // Restore the color of all slots based on sensor data
+            document.querySelectorAll(".parking-slot").forEach(slot => {
+                slot.style.backgroundColor = "#545454"; // Default color for available slots
+            });
+
+            // Hide the dismiss button
+            document.getElementById("dismiss-button").style.display = "none";
+        }
+
+        // Function to update slot color based on distance data
+        function updateSlotColor(distance, slotId) {
+            const slotElement = document.getElementById(slotId);
+            // If the slot is reserved, override all other conditions
+            if (reservedSlot === slotId) {
+                slotElement.style.backgroundColor = "orange"; // Reserved color takes priority
+            } else {
+                if (distance > 7) {
+                    slotElement.style.backgroundColor = "#4CAF50"; // Green (available)
+                } else {
+                    slotElement.style.backgroundColor = "#F44336"; // Red (occupied)
+                }
+            }
+        }
+
         // Initial data and configurations for Chart.js
         const ctx = document.getElementById('sensorGraph').getContext('2d');
         const sensorGraph = new Chart(ctx, {
@@ -112,11 +200,6 @@
 
         let currentTime = 0; // Current time in milliseconds
         let interval = 500; // Interval in milliseconds
-        //const maxDataPoints = 10; // Maximum number of data points to keep
-        let lastUpdateTime = Date.now(); // Last time the graph was updated
-        const maxAliveTime = 1000; // Maximum time without updates before considering the server dead
-
-        let dataFetched = false; // Flag to check if data has been fetched
 
         async function fetchSensorData() {
             try {
@@ -126,182 +209,30 @@
                 // Check if the data is valid (i.e., not all -1 values)
                 if (!data || (data.sensor_1 === -1 && data.sensor_2 === -1 && data.sensor_3 === -1)) {
                     console.error("No valid data received. Skipping update.");
-                   // If no valid data, return early without updating anything
+                    return;
                 }
-
-                // If new data is valid and has changed, update the graph
-                lastUpdateTime = Date.now();
 
                 // Update the graph only if data has changed (not the same as last data point)
                 currentTime += interval; // Increment time by interval
                 sensorGraph.data.labels.push('');
-
-                // Push new data values
                 sensorGraph.data.datasets[0].data.push(data.sensor_1);
                 sensorGraph.data.datasets[1].data.push(data.sensor_2);
                 sensorGraph.data.datasets[2].data.push(data.sensor_3);
 
-                // Update parking slot colors based on distance
-                updateParkingSlot('slot1', data.sensor_1);
-                updateParkingSlot('slot2', data.sensor_2);
-                updateParkingSlot('slot3', data.sensor_3);
-
-                /*// Limit the graph to the latest maxDataPoints
-                if (sensorGraph.data.labels.length > maxDataPoints) {
-                    sensorGraph.data.labels.shift();
-                    sensorGraph.data.datasets[0].data.shift();
-                    sensorGraph.data.datasets[1].data.shift();
-                    sensorGraph.data.datasets[2].data.shift();
-                }*/
-
                 sensorGraph.update(); // Redraw the graph
+
+                // Update slot colors based on distance data
+                updateSlotColor(data.sensor_1, "slot1");
+                updateSlotColor(data.sensor_2, "slot2");
+                updateSlotColor(data.sensor_3, "slot3");
 
             } catch (error) {
                 console.error("Error fetching sensor data:", error);
             }
         }
 
-        // Track the state of parking slots
-const slotStates = {
-    slot1: 'free', // free, reserved, occupied
-    slot2: 'free',
-    slot3: 'free',
-};
-
-// Function to initialize slot states based on sensor data
-async function updateSlots() {
-    try {
-        // Fetch sensor data from your backend
-        const response = await fetch("http://127.0.0.1:8000/sensors");
-        const data = await response.json();
-
-        // Update slots based on sensor data
-        updateParkingSlot_onStart('slot1', data.sensor_1);
-        updateParkingSlot_onStart('slot2', data.sensor_2);
-        updateParkingSlot_onStart('slot3', data.sensor_3);
-
-        // Update buttons based on the current state
-        Object.keys(slotStates).forEach(slotId => {
-            const buttonElement = document.getElementById(`button${slotId.slice(-1)}`);
-            if (slotStates[slotId] === 'occupied') {
-                buttonElement.style.display = 'none';  // Hide the button when occupied
-            } else if (slotStates[slotId] === 'reserved') {
-                buttonElement.style.display = 'inline-block';  // Show the button when reserved
-            } else {
-                buttonElement.style.display = 'inline-block';  // Show the button when free
-            }
-        });
-    } catch (error) {
-        console.error("Error fetching initial sensor data:", error);
-    }
-}
-
-// Function to update parking slot colors and states based on sensor data (on page load)
-function updateParkingSlot_onStart(slotId, distance) {
-    const slotElement = document.getElementById(slotId);
-
-    if (slotStates[slotId] !== 'reserved') {
-        if (distance > 100) {
-            // Slot is available
-            slotElement.style.backgroundColor = 'green';
-            slotElement.style.color = 'white';
-            slotElement.textContent = 'Available';
-            slotStates[slotId] = 'free'; // Slot is free
-        } else {
-            // Slot is occupied
-            slotElement.style.backgroundColor = 'red';
-            slotElement.style.color = 'white';
-            slotElement.textContent = 'Occupied';
-            slotStates[slotId] = 'occupied'; // Slot is occupied
-        }
-    }
-
-    // Ensure button visibility based on current slot state
-    const buttonElement = document.getElementById(`button${slotId.slice(-1)}`);
-    if (slotStates[slotId] === 'occupied') {
-        buttonElement.style.display = 'none';  // Hide button for occupied slot
-    } else {
-        buttonElement.style.display = 'inline-block';  // Show button for free or reserved slot
-    }
-}
-
-// Function to update parking slot colors based on new sensor data
-function updateParkingSlot(slotId, distance) {
-    const slotElement = document.getElementById(slotId);
-
-    // Only update if the slot is "free" or "reserved"
-    if (slotStates[slotId] !== 'reserved') {
-        if (distance > 100) {
-            // Slot is available
-            slotElement.style.backgroundColor = 'green';
-            slotElement.style.color = 'white';
-            slotElement.textContent = 'Available';
-            slotStates[slotId] = 'free';  // Slot is free
-        } else if (distance <= 100 && distance > 0) {
-            // Slot is occupied
-            slotElement.style.backgroundColor = 'red';
-            slotElement.style.color = 'white';
-            slotElement.textContent = 'Occupied';
-            slotStates[slotId] = 'occupied';  // Slot is occupied
-        }
-        else {
-            // slot if not connected
-            slotElement.style.backgroundColor = 'gray';
-            slotElement.style.color = 'white';
-            slotElement.textContent = 'NO DATA';
-            slotStates[slotId] = 'not connected';  // Slot is not connected
-        }
-    }
-
-    console.log("Slot ID:", slotId);
-    console.log("Slot Text:", slotElement.textContent);
-
-    // Ensure button visibility based on the updated state
-    const buttonElement = document.getElementById(`button${slotId.slice(-1)}`);
-    if (slotStates[slotId] === 'occupied') {
-        buttonElement.style.display = 'none';  // Hide button for occupied slot
-    } else {
-        buttonElement.style.display = 'inline-block';  // Show button for free or reserved slot
-    }
-}
-
-// Function to toggle reservation
-function toggleReservation(slotId, buttonId) {
-    const slotElement = document.getElementById(slotId);
-    const buttonElement = document.getElementById(buttonId);
-
-    if (slotStates[slotId] === 'reserved') {
-        // Dismiss reservation
-        slotStates[slotId] = 'free';
-        slotElement.textContent = 'Available';
-        slotElement.style.backgroundColor = 'green';
-        buttonElement.textContent = 'Reserve';
-    } else if (slotStates[slotId] === 'free') {
-        // Reserve the slot
-        slotStates[slotId] = 'reserved';
-        slotElement.textContent = 'Reserved';
-        slotElement.style.backgroundColor = 'orange';
-        buttonElement.textContent = 'Dismiss Reservation';
-    }
-
-    console.log("Slot ID:", slotId);
-    console.log("Button ID:", buttonId);
-    console.log("Slot Text:", slotElement.textContent);
-    console.log("Button Text:", buttonElement.textContent);
-}
-
-// Initialize slots and set up periodic updates
-document.addEventListener('DOMContentLoaded', () => {
-    // Initial fetch and update
-    updateSlots();
-
-    // Polling mechanism to fetch updates every 5 seconds
-    setInterval(updateSlots, 5000);
-});
-
         // Fetch and update the graph every second
         const dataFetchInterval = setInterval(fetchSensorData, interval);
-
     </script>
 </body>
 </html>
