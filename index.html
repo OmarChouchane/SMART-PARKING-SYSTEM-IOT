@@ -4,235 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data Graph</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .chart-container {
-            width: 80%;
-            height: 500px;
-            margin: auto;
-        }
-        .parking-slots {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .parking-slot {
-            width: 100px;
-            height: 50px;
-            margin: 10px;
-            border: 2px solid #333;
-            text-align: center;
-            line-height: 50px;
-            font-weight: bold;
-            color: white;
-            transition: background-color 0.3s ease;
-            background-color: rgb(84, 84, 84);
-        }
-        .reserve-button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .reserve-button:hover {
-            background-color: #45a049;
-        }
-        #dismiss-button {
-            display: none;
-            padding: 5px 10px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #dismiss-button:hover {
-            background-color: #e53935;
-        }
-    </style>
 </head>
 <body>
-    <h1>Real-Time Sensor Data Graph</h1>
-    <div class="chart-container">
-        <canvas id="sensorGraph"></canvas>
-    </div>
+    
 
-    <div class="parking-slots">
-        <!-- Slot 1 -->
-        <div class="parking-slot-container">
-            <div id="slot1" class="parking-slot">Slot 1</div>
-            <button id="slot1-reserve" class="reserve-button" onclick="reserveSlot('slot1')">Reserve</button>
+
+    
+
+    <!-- Header-->
+    <header class="py-5">
+        <div class="container px-lg-5">
+            <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
+                <div class="m-4 m-lg-5">
+                    <h1 class="display-5 fw-bold">SMART PARKING SYSTEM</h1>
+                    <p class="fs-4">An IOT based parking system made for INSAT students.</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="sensorGraph"></canvas>
+                </div>
+            </div>
         </div>
-        <!-- Slot 2 -->
-        <div class="parking-slot-container">
-            <div id="slot2" class="parking-slot">Slot 2</div>
-            <button id="slot2-reserve" class="reserve-button" onclick="reserveSlot('slot2')">Reserve</button>
+    </header>
+
+
+
+
+    <!-- Page Content-->
+    <section class="pt-4">
+        <div class="container px-lg-5">
+            <!-- Page Features-->
+            <div class="row gx-lg-5 parking-slots">
+                <div class="col-lg-6 col-xxl-4 mb-5">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="parking-slot-container">
+                                <div id="slot1" class="parking-slot">Slot 1</div>
+                                <button id="slot1-reserve" class="reserve-button" onclick="reserveSlot('slot1')">Reserve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xxl-4 mb-5">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="parking-slot-container">
+                                <div id="slot2" class="parking-slot">Slot 2</div>
+                                <button id="slot2-reserve" class="reserve-button" onclick="reserveSlot('slot2')">Reserve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-xxl-4 mb-5">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="parking-slot-container">
+                                <div id="slot3" class="parking-slot">Slot 3</div>
+                                <button id="slot3-reserve" class="reserve-button" onclick="reserveSlot('slot3')">Reserve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <!-- Slot 3 -->
-        <div class="parking-slot-container">
-            <div id="slot3" class="parking-slot">Slot 3</div>
-            <button id="slot3-reserve" class="reserve-button" onclick="reserveSlot('slot3')">Reserve</button>
-        </div>
-    </div>
+    </section>
 
-    <button id="dismiss-button" onclick="dismissReservation()">Dismiss Reservation</button>
+    <div class="d-flex align-items-center justify-content-center">
+        <button id="dismiss-button" onclick="dismissReservation()">Dismiss Reservation</button>
+      </div>
 
-    <script>
-        // Track the reserved slot
-        let reservedSlot = null;
+      <br>
+      <br>
+      <br> .<br><br>. <br><br>
 
-        // Function to reserve a slot
-        function reserveSlot(slotId) {
-            if (reservedSlot) {
-
-                return;
-            }
-
-            reservedSlot = slotId; // Set the reserved slot
-
-            // Hide all other reservation buttons
-            document.querySelectorAll(".reserve-button").forEach(button => {
-                
-            button.style.display = "none"; // Hide buttons
-
-            });
-
-            // Change the color of the reserved slot
-            document.getElementById(slotId).style.backgroundColor = "orange"; // Orange for reserved
-
-            // Optionally disable the dismiss button if needed
-            document.getElementById("dismiss-button").style.display = "block";
-        }
-
-        // Function to dismiss the reservation
-        function dismissReservation() {
-            if (!reservedSlot) {
-                return;
-            }
-
-            reservedSlot = null; // Clear the reserved slot
-
-            // Show all reservation buttons
-            document.querySelectorAll(".reserve-button").forEach(button => {
-                button.style.display = "block"; // Show all buttons
-            });
-
-            // Restore the color of all slots based on sensor data
-            document.querySelectorAll(".parking-slot").forEach(slot => {
-                slot.style.backgroundColor = "#545454"; // Default color for available slots
-            });
-
-            // Hide the dismiss button
-            document.getElementById("dismiss-button").style.display = "none";
-        }
-
-        // Function to update slot color based on distance data
-        function updateSlotColor(distance, slotId) {
-            const slotElement = document.getElementById(slotId);
-            // If the slot is reserved, override all other conditions
-            if (reservedSlot === slotId) {
-                slotElement.style.backgroundColor = "orange"; // Reserved color takes priority
-            } else {
-                if (distance > 7) {
-                    slotElement.style.backgroundColor = "#4CAF50"; // Green (available)
-                } else {
-                    slotElement.style.backgroundColor = "#F44336"; // Red (occupied)
-                }
-            }
-        }
-
-        // Initial data and configurations for Chart.js
-        const ctx = document.getElementById('sensorGraph').getContext('2d');
-        const sensorGraph = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Time labels (e.g., seconds)
-                datasets: [
-                    {
-                        label: 'Sensor 1',
-                        data: [],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        fill: false,
-                    },
-                    {
-                        label: 'Sensor 2',
-                        data: [],
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        fill: false,
-                    },
-                    {
-                        label: 'Sensor 3',
-                        data: [],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        fill: false,
-                    }
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: false,
-                            text: 'Time (seconds)',
-                        },
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Distance (cm)',
-                        },
-                    },
-                },
-            },
-        });
-
-        let currentTime = 0; // Current time in milliseconds
-        let interval = 500; // Interval in milliseconds
-
-        async function fetchSensorData() {
-            try {
-                const response = await fetch("http://127.0.0.1:8000/sensors");
-                const data = await response.json();
-                
-                // Check if the data is valid (i.e., not all -1 values)
-                if (!data || (data.sensor_1 === -1 && data.sensor_2 === -1 && data.sensor_3 === -1)) {
-                    console.error("No valid data received. Skipping update.");
-                    return;
-                }
-
-                // Update the graph only if data has changed (not the same as last data point)
-                currentTime += interval; // Increment time by interval
-                sensorGraph.data.labels.push('');
-                sensorGraph.data.datasets[0].data.push(data.sensor_1);
-                sensorGraph.data.datasets[1].data.push(data.sensor_2);
-                sensorGraph.data.datasets[2].data.push(data.sensor_3);
-
-                sensorGraph.update(); // Redraw the graph
-
-                // Update slot colors based on distance data
-                updateSlotColor(data.sensor_1, "slot1");
-                updateSlotColor(data.sensor_2, "slot2");
-                updateSlotColor(data.sensor_3, "slot3");
-
-            } catch (error) {
-                console.error("Error fetching sensor data:", error);
-            }
-        }
-
-        // Fetch and update the graph every second
-        const dataFetchInterval = setInterval(fetchSensorData, interval);
-    </script>
+    <script src="js/app.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/reserve.js"></script>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
