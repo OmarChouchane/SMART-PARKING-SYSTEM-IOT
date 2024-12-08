@@ -3,17 +3,17 @@ let reservedSlot = null;
 // Function to check if there are available slots
 function checkAvailableSlots() {
     const slots = document.querySelectorAll(".parking-slot");
-    let availableSlots = 0;
+    let availableSlots = [];
 
     slots.forEach(slot => {
         // Check if the slot is not reserved or occupied (e.g., green for available)
         if (slot.style.backgroundColor === "rgb(76, 175, 80)") { // Green color for available slots
-            availableSlots++;
+            availableSlots.push(slot.id); // Push the slot ID to the availableSlots array
         }
     });
 
-    if (availableSlots > 0) {
-        return `There are ${availableSlots} available slots.`;
+    if (availableSlots.length > 0) {
+        return `Available slots are: ${availableSlots.join(", ")}.`; // Join the IDs into a string
     } else {
         return "No slots available.";
     }
