@@ -83,3 +83,76 @@ async function fetchSensorData() {
 
 // Fetch data at a regular interval
 const dataFetchInterval = setInterval(fetchSensorData, interval);
+
+// Speech Recognition Setup
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SpeechRecognition) {
+    console.error("Speech recognition is not supported in this browser.");
+} else {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // Set the language to English
+    recognition.interimResults = false; // Only final results
+    recognition.maxAlternatives = 1; // Max alternative results
+    
+    recognition.onstart = () => {
+        console.log("Voice recognition started.");
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        speak("There was an error with the voice recognition.");
+    };
+
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase().trim(); // Get the recognized text
+        console.log("Voice Command:", command);
+
+        // Process the command
+        processVoiceCommand(command);
+    };
+
+    // Start the voice recognition
+    function startListening() {
+        recognition.start();
+    }
+
+    // Call startListening to begin voice recognition (e.g., when user clicks a button)
+    document.getElementById("start-voice-button").addEventListener("click", startListening);
+}
+
+function processVoiceCommand(command) {
+    // Normalize the command to handle variations
+    let responseText = '';
+
+    if (command.includes("reserve slot 1")) {
+        reserveSlot("slot1");
+        responseText = "Slot 1 has been reserved.";
+    } else if (command.includes("reserve slot 2")) {
+        reserveSlot("slot2");
+        responseText = "Slot 2 has been reserved.";
+    } else if (command.includes("reserve slot 3")) {
+        reserveSlot("slot3");
+        responseText = "Slot 3 has been reserved.";
+    } else if (command.includes("dismiss reservation")) {
+        dismissReservation();
+        responseText = "Reservation has been dismissed.";
+    }else if (command.includes("available slots")) {
+        // Check available slots and respond
+        responseText = checkAvailableSlots();
+    } else {
+        responseText = "Command not recognized. Try saying 'reserve slot 1', 'reserve slot 2', or 'dismiss reservation'.";
+    }
+
+    // Speak and alert the response
+    speak(responseText);
+    alert(responseText); // Display as an alert
+}
+
+function speak(text) {
+    const voiceResponse = document.getElementById('voiceResponse');
+    //voiceResponse.innerHTML = text; // Display the voice response on the page
+
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US"; // Set language to English
+    window.speechSynthesis.speak(speech); // Speak the text
+}

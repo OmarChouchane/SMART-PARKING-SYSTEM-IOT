@@ -1,8 +1,30 @@
 let reservedSlot = null;
 
+// Function to check if there are available slots
+function checkAvailableSlots() {
+    const slots = document.querySelectorAll(".parking-slot");
+    let availableSlots = 0;
+
+    slots.forEach(slot => {
+        // Check if the slot is not reserved or occupied (e.g., green for available)
+        if (slot.style.backgroundColor === "rgb(76, 175, 80)") { // Green color for available slots
+            availableSlots++;
+        }
+    });
+
+    if (availableSlots > 0) {
+        return `There are ${availableSlots} available slots.`;
+    } else {
+        return "No slots available.";
+    }
+}
+
+
 function reserveSlot(slotId) {
     if (reservedSlot) {
         alert("You already have a reservation. Please dismiss it before making a new one.");
+        ResponseText = "You already have a reservation. Please dismiss it before making a new one.";
+        speak(responseText);
         return; // Prevent further action if a reservation is already made
     }
 
