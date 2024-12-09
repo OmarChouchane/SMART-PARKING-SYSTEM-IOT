@@ -21,10 +21,15 @@ function checkAvailableSlots() {
 
 
 function reserveSlot(slotId) {
+    const slot = document.getElementById(slotId);
+
+    // Check if the slot is available (e.g., green for available)
+    if (slot.style.backgroundColor !== "rgb(76, 175, 80)") { // Green color for available slots
+        return `${slotId} is not available.`;
+    }
+
     if (reservedSlot) {
-        
-        responseText = "You already have a reservation. Please dismiss it before making a new one.";
-        return responseText ;
+        return "You already have a reservation.";
     }
 
     reservedSlot = slotId; // Set the reserved slot
@@ -35,12 +40,11 @@ function reserveSlot(slotId) {
     });
 
     // Change the color of the reserved slot
-    document.getElementById(slotId).style.backgroundColor = "orange"; // Orange for reserved
+    slot.style.backgroundColor = "orange"; // Orange for reserved
 
     // Show dismiss button
     document.getElementById("dismiss-button").style.display = "block";
-    responseText = `${slotId} has been reserved.`;
-    return responseText;
+    return `${slotId} has been reserved.`;
 }
 
 function dismissReservation() {
