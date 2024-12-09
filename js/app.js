@@ -42,6 +42,9 @@ const sensorGraph = new Chart(ctx, {
                 },
             },
             y: {
+                beginAtZero: true,
+                min: 0,       // Minimum y-axis value
+                max: 30,      // Maximum y-axis value
                 title: {
                     display: true,
                     text: 'Distance (cm)',
@@ -125,14 +128,11 @@ function processVoiceCommand(command) {
     let responseText = '';
 
     if (command.includes("reserve slot 1")) {
-        reserveSlot("slot1");
-        responseText = "Slot 1 has been reserved.";
+        responseText = reserveSlot("slot1");
     } else if (command.includes("reserve slot 2")) {
-        reserveSlot("slot2");
-        responseText = "Slot 2 has been reserved.";
+        responseText = reserveSlot("slot2");
     } else if (command.includes("reserve slot 3")) {
-        reserveSlot("slot3");
-        responseText = "Slot 3 has been reserved.";
+        responseText = reserveSlot("slot3");
     } else if (command.includes("dismiss reservation")) {
         dismissReservation();
         responseText = "Reservation has been dismissed.";
@@ -140,7 +140,7 @@ function processVoiceCommand(command) {
         // Check available slots and respond
         responseText = checkAvailableSlots();
     } else {
-        responseText = "Command not recognized. Try saying 'reserve slot 1', 'reserve slot 2', or 'dismiss reservation'.";
+        responseText = "Command not recognized.";
     }
 
     // Speak and alert the response
