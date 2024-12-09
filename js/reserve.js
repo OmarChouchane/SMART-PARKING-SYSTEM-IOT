@@ -22,10 +22,9 @@ function checkAvailableSlots() {
 
 function reserveSlot(slotId) {
     if (reservedSlot) {
-        alert("You already have a reservation. Please dismiss it before making a new one.");
-        ResponseText = "You already have a reservation. Please dismiss it before making a new one.";
-        speak(responseText);
-        return; // Prevent further action if a reservation is already made
+        
+        responseText = "You already have a reservation. Please dismiss it before making a new one.";
+        return responseText ;
     }
 
     reservedSlot = slotId; // Set the reserved slot
@@ -40,6 +39,8 @@ function reserveSlot(slotId) {
 
     // Show dismiss button
     document.getElementById("dismiss-button").style.display = "block";
+    responseText = `${slotId} has been reserved.`;
+    return responseText;
 }
 
 function dismissReservation() {
